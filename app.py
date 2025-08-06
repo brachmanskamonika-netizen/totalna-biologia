@@ -8,11 +8,12 @@ def load_data():
 
 df = load_data()
 
+st.set_page_config(page_title="🌸 Agent AI Totalnej Biologii", layout="wide")
 st.title("🌸 Agent AI Totalnej Biologii")
 st.write("Wpisz objaw, organ lub wybierz układ ciała, aby znaleźć konflikt biologiczny i jego znaczenie.")
 
 # Tryby pracy
-mode = st.radio("Wybierz tryb:", ["🔍 Konsultacja", "📖 Atlas Układów"])
+mode = st.radio("Wybierz tryb:", ["🔍 Konsultacja", "📖 Atlas Układów"], horizontal=True)
 
 if mode == "🔍 Konsultacja":
     query = st.text_input("Podaj objaw lub organ (np. 'żołądek', 'kaszel', 'biegunka'):")
@@ -22,7 +23,11 @@ if mode == "🔍 Konsultacja":
         
         if not results.empty:
             st.write("### Wyniki wyszukiwania:")
-            st.dataframe(results)
+            for _, row in results.iterrows():
+                with st.expander(f"{row['Organ']} – {row['Konflikt biologiczny']}"):
+                    st.write(f"**Układ:** {row['Układ']}")
+                    st.write(f"**Faza aktywna:** {row['Faza aktywna']}")
+                    st.write(f"**Faza zdrowienia:** {row['Faza zdrowienia']}")
         else:
             st.warning("Brak wyników dla podanego zapytania.")
 
@@ -31,5 +36,11 @@ elif mode == "📖 Atlas Układów":
     selected = st.selectbox("Wybierz układ ciała:", układy)
 
     results = df[df["Układ"] == selected]
+
     st.write(f"### Atlas dla: {selected}")
-    st.dataframe(results)
+    
+    for _, row in results.iterrows():
+        with st.expander(f"{row['Organ']} – {row['Konflikt biologiczny']}"):
+            st.write(f"**Faza aktywna:** {row['Faza aktywna']}")
+            st.write(f"**Faza zdrowienia:** {row['Faza zdrowienia']}")
+            st.write(f"**Opis:** {row['Opis'] if 'Opis' in row else 'Brak dodatkowego opisu'}")
